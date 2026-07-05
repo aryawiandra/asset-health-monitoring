@@ -1,0 +1,6 @@
+# Git LFS — track large binary files
+*.parquet filter=lfs diff=lfs merge=lfs -text
+*.pkl     filter=lfs diff=lfs merge=lfs -text
+
+# Large raw CSV
+data/raw/PdM_telemetry.csv filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb.bak
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Streamlit
+.streamlit/
+
+# Large processed data — tracked via Git LFS
+# (see .gitattributes)
+
+# Raw large file — tracked via Git LFS
+# data/raw/PdM_telemetry.csv
+
+# Logs & temp
+*.log
+*.tmp
+reports/figures/.gitkeep
+
+# Model artifacts (large) — tracked via Git LFS
+# models/isolation_forest.pkl
+# models/one_class_svm.pkl
