@@ -861,10 +861,24 @@ elif page == "🔮 Anomaly Forecast":
     fig_multi.add_hline(y=thresh_critical, line_dash="dash", line_color="#E24B4A",
                         annotation_text="Critical")
 
+    # Use add_shape instead of add_vline to avoid Plotly annotation mean calculation
+    # which crashes when x-axis has mixed datetime/string types
     last_hist_dt_str = df["datetime"].max().isoformat()
-    fig_multi.add_vline(x=last_hist_dt_str, line_dash="solid",
-                         line_color="rgba(255,255,255,0.25)",
-                         annotation_text="Now ↓ Forecast →")
+    fig_multi.add_shape(
+        type="line",
+        x0=last_hist_dt_str, x1=last_hist_dt_str,
+        y0=0, y1=1,
+        xref="x", yref="paper",
+        line=dict(color="rgba(255,255,255,0.25)", dash="solid", width=1.5),
+    )
+    fig_multi.add_annotation(
+        x=last_hist_dt_str, y=1.0,
+        xref="x", yref="paper",
+        text="← History | Forecast →",
+        showarrow=False,
+        font=dict(color="rgba(255,255,255,0.5)", size=10),
+        xanchor="center", yanchor="bottom",
+    )
 
     fig_multi.update_layout(
         height=400,
