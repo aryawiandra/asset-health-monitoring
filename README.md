@@ -2,7 +2,7 @@
 
 # 🔧 Asset Health Monitoring
 
-**Predictive Maintenance System untuk Armada Mesin Industri**
+**Predictive Maintenance System for Industrial Machine Fleets**
 
 [![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.x-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -10,300 +10,359 @@
 [![Git LFS](https://img.shields.io/badge/Git%20LFS-686%20MB-lightgrey?style=flat)](https://git-lfs.github.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-*Pertamina EDM — Mini Project Kerja Praktik*
+*Pertamina EDM — Internship Mini Project*
 
 </div>
 
 ---
 
-## 📖 Tentang Proyek
+# 📖 Overview
 
-Sistem **Asset Health Monitoring** yang mendeteksi anomali dan memproyeksikan potensi kegagalan mesin industri secara proaktif menggunakan pendekatan **unsupervised machine learning**. Dashboard interaktif memvisualisasikan kondisi kesehatan armada 100 mesin secara real-time, dilengkapi fitur **Anomaly Forecasting** yang memprediksi risiko 72 jam dan 7 hari ke depan.
+**Asset Health Monitoring** is a predictive maintenance system that proactively detects anomalies and estimates potential machine failures using **unsupervised machine learning**.
 
-### ✨ Fitur Utama
-
-| Fitur | Deskripsi |
-|-------|-----------|
-| 🔍 **Anomaly Detection** | Isolation Forest + One-Class SVM mendeteksi anomali tanpa labeled data |
-| 🏥 **Health Score** | Skor 0–100 per mesin per jam, intuitif dan dapat dikustomisasi |
-| 🔮 **Anomaly Forecast** | Proyeksi health score 72h & 7d ke depan + 7-Day Risk Calendar |
-| 📊 **Fleet Overview** | Bird's-eye view 100 mesin + forecast KPIs |
-| 🔬 **Machine Detail** | Deep-dive per mesin dengan gauge, sensor time series, forecast chart |
-| ⚠️ **Anomaly Timeline** | Heatmap temporal seluruh anomali di fleet |
+The interactive dashboard provides real-time fleet health monitoring for 100 industrial machines and includes an **Anomaly Forecasting** module capable of projecting maintenance risks **72 hours** and **7 days** ahead.
 
 ---
 
-## 🏗️ Arsitektur Pipeline
+# ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Anomaly Detection** | Detects abnormal operating conditions using Isolation Forest and One-Class SVM without labeled data |
+| 🏥 **Health Score** | Intuitive 0–100 machine health score computed hourly |
+| 🔮 **Anomaly Forecasting** | Forecasts health score 72 hours and 7 days ahead with a 7-Day Risk Calendar |
+| 📊 **Fleet Overview** | Fleet-wide monitoring dashboard with forecast KPIs |
+| 🔬 **Machine Detail** | Individual machine analysis including gauges, sensor trends, and forecast charts |
+| ⚠️ **Anomaly Timeline** | Fleet-wide temporal visualization of anomaly events |
+
+---
+
+# 🏗 Pipeline Architecture
 
 ```
-Raw CSV Data (5 file)
+Raw CSV Data (5 files)
     │
     ▼
-[Notebook 01] Exploratory Data Analysis
+Notebook 01 - Exploratory Data Analysis
     │
     ▼
-[Notebook 02] Preprocessing & Feature Engineering
-    │  → 44 features: sensor rolling stats, lag features, error counts, maintenance
+Notebook 02 - Preprocessing & Feature Engineering
+    │
+    ├── 44 engineered features
     │
     ▼
-data/processed/features.parquet
+features.parquet
     │
     ▼
-[Notebook 03] Model Training
-    │  → Isolation Forest (n=200, contamination=0.05)
-    │  → One-Class SVM (baseline)
-    │  → Health Score normalization (IF score → 0–100)
+Notebook 03 - Model Training
+    │
+    ├── Isolation Forest
+    ├── One-Class SVM
+    └── Health Score Normalization
     │
     ▼
-data/processed/scored.parquet
+scored.parquet
     │
     ▼
-[Dashboard] Streamlit App
-    │  → Fleet Overview + Forecast KPIs
-    │  → Machine Detail + Forecast Chart
-    │  → Anomaly Timeline
-    └  → 🔮 Anomaly Forecast Page (baru)
+Streamlit Dashboard
+    ├── Fleet Overview
+    ├── Machine Detail
+    ├── Anomaly Timeline
+    └── Anomaly Forecasting
 ```
 
 ---
 
-## 📁 Struktur Direktori
+# 📁 Project Structure
 
 ```
 asset-health-monitoring/
-├── 📂 data/
-│   ├── raw/                        ← Dataset CSV original (5 file)
-│   │   ├── PdM_telemetry.csv       ← 76 MB — sensor readings per jam [LFS]
-│   │   ├── PdM_errors.csv          ← Error codes mesin
-│   │   ├── PdM_failures.csv        ← Catatan kegagalan komponen
-│   │   ├── PdM_maint.csv           ← Catatan maintenance
-│   │   └── PdM_machines.csv        ← Metadata mesin
+├── data/
+│   ├── raw/
+│   │   ├── PdM_telemetry.csv
+│   │   ├── PdM_errors.csv
+│   │   ├── PdM_failures.csv
+│   │   ├── PdM_maint.csv
+│   │   └── PdM_machines.csv
+│   │
 │   └── processed/
-│       ├── features.parquet        ← Output Notebook 02 [LFS, 503 MB]
-│       └── scored.parquet          ← Output Notebook 03 [LFS, 72 MB]
+│       ├── features.parquet
+│       └── scored.parquet
 │
-├── 📂 models/
-│   ├── isolation_forest.pkl        ← Trained IF model [LFS]
-│   ├── one_class_svm.pkl           ← Trained OC-SVM model [LFS]
-│   ├── scaler.pkl                  ← StandardScaler [LFS]
-│   └── feature_cols.json           ← Feature column names
+├── models/
+│   ├── isolation_forest.pkl
+│   ├── one_class_svm.pkl
+│   ├── scaler.pkl
+│   └── feature_cols.json
 │
-├── 📂 notebooks/
-│   ├── 01_eda.ipynb                ← Exploratory Data Analysis
-│   ├── 02_preprocessing.ipynb      ← Feature Engineering
-│   └── 03_modeling.ipynb           ← Model Training & Evaluation
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_preprocessing.ipynb
+│   └── 03_modeling.ipynb
 │
-├── 📂 dashboard/
-│   └── app.py                      ← Streamlit Dashboard (4 halaman)
+├── dashboard/
+│   └── app.py
 │
-├── 📂 reports/figures/             ← Plot dari notebook (12 gambar)
-├── .gitattributes                  ← Git LFS tracking rules
-├── .gitignore
+├── reports/
+│   └── figures/
+│
 ├── requirements.txt
-├── PROJECT_DOCUMENTATION.md        ← Dokumentasi teknis lengkap
-└── README.md                       ← File ini
+├── PROJECT_DOCUMENTATION.md
+└── README.md
 ```
 
-> **Git LFS**: File berukuran besar (`.parquet`, `.pkl`, `PdM_telemetry.csv`) di-track via Git LFS. Pastikan `git-lfs` terinstall sebelum clone.
+> **Git LFS:** Large files (`.parquet`, `.pkl`, `PdM_telemetry.csv`) are tracked with Git LFS. Please install Git LFS before cloning.
 
 ---
 
-## 🤖 Model & Performa
+# 🤖 Model Performance
 
-### Isolation Forest (Model Utama)
+## Primary Model — Isolation Forest
 
 ```python
 IsolationForest(
-    n_estimators  = 200,    # 200 trees untuk stabilitas
-    contamination = 0.05,   # ekspektasi 5% data anomali
-    random_state  = 42,
-    n_jobs        = -1      # parallelisasi semua CPU
+    n_estimators=200,
+    contamination=0.05,
+    random_state=42,
+    n_jobs=-1
 )
 ```
 
-### Hasil Evaluasi (Test Set: Okt–Des 2015)
+### Evaluation (October–December 2015 Test Set)
 
-| Metrik | Isolation Forest | One-Class SVM |
+| Metric | Isolation Forest | One-Class SVM |
 |--------|:---:|:---:|
 | **Recall (Pre-failure)** | **96%** | 95% |
-| Precision (Pre-failure) | 25% | 26% |
-| F1-score | 0.40 | 0.40 |
+| Precision | 25% | 26% |
+| F1 Score | 0.40 | 0.40 |
 | Average Precision | 0.642 | 0.710 |
-| False Negatives (missed) | **188 / 4,221** | 198 / 4,221 |
-| Training time | ~12 detik | ~20 detik |
+| False Negatives | **188 / 4,221** | 198 / 4,221 |
+| Training Time | ~12 sec | ~20 sec |
 
-> 💡 **Recall 96%** diprioritaskan karena dalam konteks keselamatan industri, *missed failure* jauh lebih berbahaya daripada false alarm.
-
-### Health Score
-
-```
-Health Score = normalize(IF anomaly score) × 100
-
-🟢 70–100  →  Healthy   (operasi normal)
-🟡 40–70   →  Warning   (perlu perhatian)
-🔴  0–40   →  Critical  (tindakan segera)
-```
-
-Threshold dapat dikustomisasi secara interaktif di sidebar dashboard.
+> **Recall (96%)** was intentionally prioritized because missing an impending equipment failure is significantly more costly than generating additional false alarms in industrial environments.
 
 ---
 
-## 🔮 Anomaly Forecasting
+# 🏥 Health Score
 
-Fitur baru yang memproyeksikan potensi anomali, warnings, dan critical events ke depan menggunakan **two-layer approach**:
+```
+Health Score = Normalized Isolation Forest anomaly score × 100
 
-### Metode
-| Layer | Teknik | Output |
-|-------|--------|--------|
-| 1 | **Linear Regression** pada health score 14 hari terakhir | Forecast score +72h & +7d |
-| 2 | **Exponential Smoothing** (α=0.3) pada daily anomaly rate | Projected anomaly rate |
+70–100  Healthy
+40–70   Warning
+0–40    Critical
+```
+
+Thresholds can be adjusted interactively from the dashboard sidebar.
+
+---
+
+# 🔮 Anomaly Forecasting
+
+The forecasting module uses a **two-layer prediction approach**.
+
+## Layer 1
+
+**Linear Regression**
+
+Forecasts machine health score using the previous **14 days** of historical data.
+
+Outputs:
+
+- 72-hour forecast
+- 7-day forecast
+- Trend slope
+- Confidence interval
+- Estimated days until critical condition
+
+## Layer 2
+
+**Exponential Smoothing (α = 0.3)**
+
+Projects future fleet anomaly rate using daily anomaly statistics.
 
 ### Risk Classification
-| Level | Kondisi |
-|-------|---------|
-| 🔴 **Critical** | Forecast score < Critical threshold **atau** anomaly rate > 50% |
-| 🟠 **High** | Forecast score < Warning threshold **atau** anomaly rate > 35% |
-| 🟡 **Medium** | Forecast score < Warning+10 **atau** anomaly rate > 20% |
-| 🟢 **Low** | Tidak memenuhi kondisi di atas |
 
-### Output per Mesin
-- `forecast_72h` — prediksi health score 72 jam ke depan
-- `forecast_7d` — prediksi health score 7 hari ke depan
-- `confidence interval` — ±1–1.5× residual std dari linear fit
-- `trend_slope` — kecepatan perubahan (pts/day)
-- `days_to_critical` — estimasi hari hingga zona critical
-- `risk_level` — Low / Medium / High / Critical
+| Level | Condition |
+|--------|-----------|
+| 🔴 Critical | Forecast score below Critical threshold or anomaly rate >50% |
+| 🟠 High | Forecast score below Warning threshold or anomaly rate >35% |
+| 🟡 Medium | Forecast score approaching Warning threshold or anomaly rate >20% |
+| 🟢 Low | Normal operating condition |
+
+Each machine produces:
+
+- `forecast_72h`
+- `forecast_7d`
+- `confidence_interval`
+- `trend_slope`
+- `days_to_critical`
+- `risk_level`
 
 ---
 
-## 🚀 Cara Menjalankan
+# 🚀 Getting Started
 
-### Prerequisites
+## Prerequisites
 
 ```bash
-# Install git-lfs (wajib untuk clone file besar)
-brew install git-lfs   # macOS
+brew install git-lfs
 git lfs install
 ```
 
-### 1. Clone Repository
+---
+
+## Clone Repository
 
 ```bash
 git clone https://github.com/aryawiandra/asset-health-monitoring.git
+
 cd asset-health-monitoring
 ```
 
-> ⚠️ Clone akan otomatis download file LFS (~686 MB). Pastikan koneksi internet stabil.
+Large Git LFS files (~686 MB) will be downloaded automatically.
 
-### 2. Setup Environment
+---
+
+## Create Virtual Environment
 
 ```bash
 python3.10 -m venv venv
-source venv/bin/activate          # macOS/Linux
-# venv\Scripts\activate           # Windows
+
+source venv/bin/activate
+# Windows
+# venv\Scripts\activate
 
 pip install -r requirements.txt
 ```
 
-### 3. Jalankan Notebooks (opsional — data sudah tersedia via LFS)
+---
+
+## Execute Notebooks (Optional)
+
+Preprocessed data and trained models are already included through Git LFS.
+
+To regenerate everything from scratch:
 
 ```bash
-# Urutan wajib jika ingin re-generate dari scratch:
+jupyter nbconvert --execute --to notebook --inplace notebooks/01_eda.ipynb
 
-# EDA (opsional)
-jupyter nbconvert --to notebook --execute --inplace \
-  --ExecutePreprocessor.timeout=600 notebooks/01_eda.ipynb
+jupyter nbconvert --execute --to notebook --inplace notebooks/02_preprocessing.ipynb
 
-# Preprocessing (wajib sebelum modeling)
-jupyter nbconvert --to notebook --execute --inplace \
-  --ExecutePreprocessor.timeout=1200 notebooks/02_preprocessing.ipynb
-
-# Modeling
-jupyter nbconvert --to notebook --execute --inplace \
-  --ExecutePreprocessor.timeout=1200 notebooks/03_modeling.ipynb
+jupyter nbconvert --execute --to notebook --inplace notebooks/03_modeling.ipynb
 ```
 
-| Notebook | Estimasi Waktu |
-|----------|:---:|
-| 01 EDA | ~30 detik |
-| 02 Preprocessing | ~5–15 menit |
-| 03 Modeling | ~1–2 menit |
+Approximate execution times:
 
-### 4. Jalankan Dashboard
-
-```bash
-streamlit run dashboard/app.py --server.port 8501
-```
-
-Buka browser: **http://localhost:8501**
+| Notebook | Runtime |
+|-----------|---------|
+| EDA | ~30 sec |
+| Feature Engineering | 5–15 min |
+| Model Training | 1–2 min |
 
 ---
 
-## 📊 Dashboard
+## Launch Dashboard
 
-Dashboard dibagi menjadi **4 halaman navigasi**:
+```bash
+streamlit run dashboard/app.py
+```
 
-### 🔧 Fleet Overview
-- KPI row 1: Total Machines, Critical, Warning, Healthy, Anomaly Events
-- KPI row 2 *(forecast)*: High-Risk 72h, Critical Risk 7d, Machines Declining, Avg Fleet Score 7d
-- Bar chart health score distribution + donut status breakdown
-- Machine Status Table dengan kolom forecast & export CSV
+Open:
 
-### 🔍 Machine Detail
-- Gauge chart health score dengan zona warna
-- Sensor time series (Volt, Rotate, Pressure, Vibration) + anomaly markers
-- Health Score Timeline + anomaly overlay
-- **🔮 Forecast Section**: Score 72h/7d, Trend, Days to Critical, Forecast Chart dengan confidence interval
-
-### ⚠️ Anomaly Timeline
-- Scatter heatmap: tanggal × Machine ID, ukuran = jumlah anomali/hari
-- Fleet-level daily chart: anomaly count + avg health score
-- Top 10 Machines by Anomaly Count
-
-### 🔮 Anomaly Forecast *(baru)*
-- Forecast Summary KPIs (Critical/High/Medium/Low risk count)
-- Forecast Risk Table — sortable, exportable CSV
-- Risk Distribution Donut + Now vs 7d Scatter
-- Projected Health Score Chart — top 10 at-risk machines
-- **7-Day Risk Calendar** — heatmap mesin × hari, warna-coded
-- Anomaly Rate Bar Chart — current vs projected
+```
+http://localhost:8501
+```
 
 ---
 
-## 📦 Dataset
+# 📊 Dashboard Pages
+
+## Fleet Overview
+
+- Fleet KPIs
+- Forecast KPIs
+- Health score distribution
+- Machine status table
+- CSV export
+
+---
+
+## Machine Detail
+
+- Health gauge
+- Sensor time-series
+- Health timeline
+- Forecast visualization
+- Confidence interval
+- Days-to-critical estimation
+
+---
+
+## Anomaly Timeline
+
+- Fleet anomaly heatmap
+- Daily anomaly trend
+- Top anomalous machines
+
+---
+
+## Anomaly Forecast
+
+- Fleet risk summary
+- Forecast risk table
+- Risk distribution
+- Projected health scores
+- 7-Day Risk Calendar
+- Projected anomaly rate
+
+---
+
+# 📦 Dataset
 
 **Microsoft Azure AI Gallery — Predictive Maintenance Dataset**
 
-| File | Ukuran | Deskripsi |
-|------|:---:|-----------|
-| `PdM_telemetry.csv` | 76 MB | Sensor readings per jam: volt, rotate, pressure, vibration |
-| `PdM_errors.csv` | 128 KB | Error codes (error1–error5) |
-| `PdM_failures.csv` | 24 KB | Catatan kegagalan komponen (comp1–comp4) |
-| `PdM_maint.csv` | 104 KB | Catatan maintenance per komponen |
-| `PdM_machines.csv` | 4 KB | Metadata: model (model1–model4), age |
+| File | Size | Description |
+|------|------|-------------|
+| PdM_telemetry.csv | 76 MB | Hourly sensor readings |
+| PdM_errors.csv | 128 KB | Machine error logs |
+| PdM_failures.csv | 24 KB | Historical component failures |
+| PdM_maint.csv | 104 KB | Maintenance records |
+| PdM_machines.csv | 4 KB | Machine metadata |
 
-**Statistik:** 100 mesin × 8,761 jam = **876,100 baris** | Jan 2015 – Jan 2016
+Dataset Statistics:
 
----
-
-## 🔧 Feature Engineering
-
-**44 features** digunakan sebagai input model:
-
-```
-Raw sensors (4):       volt, rotate, pressure, vibration
-Rolling mean (8):      {sensor}_mean3h, {sensor}_mean24h
-Rolling std (8):       {sensor}_std3h, {sensor}_std24h
-Rate of change (4):    {sensor}_roc
-Lag features (12):     {sensor}_lag1h, _lag3h, _lag6h
-Error counts (6):      error{1-5}_count24h, total_error_count24h
-Maintenance (1):       days_since_maint
-Machine metadata (2):  model_code, age
-```
+- 100 industrial machines
+- 876,100 observations
+- January 2015 – January 2016
 
 ---
 
-## 📋 Requirements
+# 🔧 Feature Engineering
+
+A total of **44 engineered features** are used.
+
+```
+Raw Sensors (4)
+
+Rolling Mean (8)
+
+Rolling Standard Deviation (8)
+
+Rate of Change (4)
+
+Lag Features (12)
+
+Error Counts (6)
+
+Maintenance Features (1)
+
+Machine Metadata (2)
+```
+
+---
+
+# 📋 Requirements
 
 ```
 streamlit
@@ -315,28 +374,33 @@ pyarrow
 joblib
 ```
 
-Lihat [`requirements.txt`](requirements.txt) untuk versi lengkap.
+See **requirements.txt** for the complete dependency list.
 
 ---
 
-## 📈 Potensi Pengembangan
+# 🚀 Future Improvements
 
-- [ ] LSTM/temporal model untuk menangkap sequential patterns
-- [ ] Per-component failure prediction (comp1–comp4 separately)
-- [ ] Real-time streaming data integration
-- [ ] Alert system (email/Slack notification)
-- [ ] Root cause analysis per anomali
-- [ ] Tuning `contamination` parameter untuk reduce false positives
-- [x] **Anomaly Forecasting** — proyeksi 72h & 7d ✅
+- LSTM / Temporal Deep Learning models
+- Component-level failure prediction
+- Real-time streaming integration
+- Email / Slack alert system
+- Root cause analysis
+- Contamination parameter optimization
+- Explainable AI (SHAP)
+- Remaining Useful Life (RUL) estimation
 
 ---
 
-## 📄 Lisensi
+# 📄 License
 
-MIT License — lihat [LICENSE](LICENSE) untuk detail.
+This project is licensed under the MIT License.
+
+See **LICENSE** for details.
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ for Pertamina EDM Mini Project KP</sub>
+
+Built for the Pertamina EDM Internship Mini Project
+
 </div>
